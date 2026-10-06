@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+# tg-green-chat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-чат для обмена текстовыми сообщениями в Telegram через сервис [GREEN-API](https://green-api.com/telegram).
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** — UI
+- **TypeScript** — типизация
+- **Vite** — сборка и дев-сервер
+- **Tailwind CSS 4** — стилизация
 
-## React Compiler
+## Установка и запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Клонировать репозиторий
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-	globalIgnores(["dist"]),
-	{
-		files: ["**/*.{ts,tsx}"],
-		extends: [
-			// Other configs...
-
-			// Remove tseslint.configs.recommended and replace with this
-			tseslint.configs.recommendedTypeChecked,
-			// Alternatively, use this for stricter rules
-			tseslint.configs.strictTypeChecked,
-			// Optionally, add this for stylistic rules
-			tseslint.configs.stylisticTypeChecked,
-
-			// Other configs...
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
-		},
-	},
-]);
+```bash
+git clone https://github.com/ValeryZhitnikov/tg-green-chat.git
+cd tg-green-chat
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Установить зависимости
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-	globalIgnores(["dist"]),
-	{
-		files: ["**/*.{ts,tsx}"],
-		extends: [
-			// Other configs...
-			// Enable lint rules for React
-			reactX.configs["recommended-typescript"],
-			// Enable lint rules for React DOM
-			reactDom.configs.recommended,
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
-		},
-	},
-]);
+```bash
+npm install
 ```
+
+### 3. Настроить переменные окружения
+
+Создайте файл `.env` в корне проекта на основе `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Укажите базовый URL API GREEN-API:
+
+```
+VITE_GREEN_API_URL=https://api.green-api.com
+```
+
+### 4. Запустить дев-сервер
+
+```bash
+npm run dev
+```
+
+Приложение откроется по адресу `http://localhost:5173`.
+
+### 5. Сборка для продакшена
+
+```bash
+npm run build
+```
+
+Собранные файлы окажутся в папке `dist/`.
+
+## Как пользоваться
+
+1. Откройте приложение и введите `idInstance` и `apiTokenInstance` из личного кабинета GREEN-API.
+2. Укажите номер телефона получателя в международном формате без `+` (например, `79991234567`).
+3. Напишите сообщение и отправьте его — оно уйдёт в Telegram.
+4. Ответы собеседника появятся в чате автоматически.
+
+## Структура проекта
+
+```
+src/
+├── api/              # HTTP-запросы к GREEN-API
+│   ├── greenApi.ts
+│   └── types.ts
+├── services/         # Бизнес-логика (парсинг, нормализация, настройка инстанса)
+│   └── chatService.ts
+├── hooks/            # React-хуки (авторизация, чат с polling)
+│   ├── useAuth.ts
+│   └── useChat.ts
+├── context/          # Общий контекст (credentials, phone)
+│   └── AppContext.tsx
+├── components/       # Компоненты
+│   ├── ui/           # Базовые UI-элементы
+│   ├── ChatHeader.tsx
+│   ├── MessageInput.tsx
+│   └── MessageList.tsx
+├── screens/          # Экраны (вход, создание чата, чат)
+├── App.tsx
+└── main.tsx
+```
+
+## Известные ограничения
+
+- История сообщений не сохраняется — при перезагрузке страницы чат пуст.
+- Сообщения, отправленные с телефона (не из приложения), в интерфейсе не отображаются.
+- Поддерживаются только текстовые сообщения.
